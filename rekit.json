@@ -1,0 +1,13 @@
+{
+  "devPort": 4000,
+  "servePort": 4001,
+  "appType": "rekit-plugin",
+  "css": "less",
+  "folders": [
+    "scripts"
+  ],
+  "files": [
+    "package.json",
+    "rekit.json"
+  ]
+}
