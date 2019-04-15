@@ -58,7 +58,6 @@ function config(server, app, args) {
       allDeps[key] = {
         requiredVersion: allDeps[key],
         installedVersion,
-        latestVersion: 'TODO',
       };
     });
 

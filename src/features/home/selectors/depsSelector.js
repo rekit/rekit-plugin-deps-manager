@@ -5,7 +5,7 @@ const rawDepsSelector = state => state.deps;
 const rawDevDepsSelector = state => state.devDeps;
 const allDepsSelector = state => state.allDeps;
 
-function compute(deps, allDeps) {
+function compute(deps, latestVersions, filter) {
   return deps
     .map(name => {
       const dep = allDeps[name];

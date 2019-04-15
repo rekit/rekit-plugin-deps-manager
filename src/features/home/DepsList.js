@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Icon, Input, Table, Spin, Menu, Modal } from 'antd';
+import semverDiff from 'semver-diff';
 import * as actions from './redux/actions';
+// import { getDeps } from '../selectors/depsSelector';
+import { createSelector } from 'reselect';
 
-export default class DepsList extends Component {
+export class DepsList extends Component {
   static propTypes = {
     deps: PropTypes.object.isRequired,
     latestVersions: PropTypes.object.isRequired,
@@ -46,7 +49,7 @@ export default class DepsList extends Component {
         title: 'Latest',
         width: 140,
         filterDropdown: (
-          <div className="status-filter">
+          <div className="deps-manager_deps-list-status-filter">
             <Menu
               className="status-filter-menu"
               selectedKeys={this.state.statusFilter}
@@ -89,8 +92,7 @@ export default class DepsList extends Component {
             statusFilterDropdownVisible: visible,
           });
         },
-        render: (status, record) => {
-          const { latestVersions } = this.props;
+        render(status, record) {
           return (
             <span className={`status-${record.status}`}>
               {status ? (
@@ -98,57 +100,59 @@ export default class DepsList extends Component {
               ) : (
                 ''
               )}{' '}
-              {latestVersions[record.name] || '...'}
+              {record.latestVersion || '...'}
             </span>
           );
         },
       },
-      // {
-      //   dataIndex: 'action',
-      //   title: 'Action',
-      //   width: 100,
-      //   align: 'center',
-      //   render: (__, item) => {
-      //     const depStatus = this.props.depStatus;
-      //     const key1 = `updatePackage!${item.name}`;
-      //     const key2 = `removePackage!${item.name}`;
-      //     const key3 = `installPackage!${item.name}`;
-      //     if (depStatus[key1] || depStatus[key2] || depStatus[key3]) {
-      //       return (
-      //         <div className="actions">
-      //           <Icon type="loading-3-quarters" spin onClick={this.handleLoadingIconClick} />
-      //         </div>
-      //       );
-      //     }
-      //     return (
-      //       <div className="actions">
-      //         <Icon
-      //           type="arrow-up"
-      //           title="Upgrade to the latest version."
-      //           onClick={() => this.handleUpdatePackage(item.name)}
-      //         />
-      //         <Icon
-      //           type="close"
-      //           title="Remove"
-      //           onClick={() => this.handleRemovePackage(item.name)}
-      //         />
-      //       </div>
-      //     );
-      //   },
-      // },
+      {
+        dataIndex: 'action',
+        title: 'Action',
+        width: 100,
+        align: 'center',
+        render: (__, item) => {
+          return (
+            <div className="actions">
+              <Icon
+                type="arrow-up"
+                title="Upgrade to the latest version."
+                onClick={() => this.handleUpdatePackage(item.name)}
+              />
+              <Icon
+                type="close"
+                title="Remove"
+                onClick={() => this.handleRemovePackage(item.name)}
+              />
+            </div>
+          );
+        },
+      },
     ];
   }
 
-  getData() {
-    const { deps } = this.props;
-    return Object.keys(deps).map(key => ({
-      name: key,
-      ...deps[key],
-    }));
-    // return this.props.deps.filter(
-    //   d => !this.state.statusFilter.length || this.state.statusFilter.includes(d.status),
-    // );
-  }
+  getData = createSelector(
+    props => props.deps,
+    props => props.latestVersions,
+    (props, state) => state.statusFilter,
+    (deps, latestVersions, statusFilter) => {
+      const allDeps = Object.keys(deps).map(key => {
+        const latestVersion = latestVersions[key];
+        const dep = deps[key];
+        const status =
+          latestVersion && dep.installedVersion !== '--'
+            ? semverDiff(dep.installedVersion, latestVersion) + '' // eslint-disable-line
+            : '';
+        return {
+          ...dep,
+          name: key,
+          latestVersion,
+          status,
+        };
+      });
+      if (!statusFilter.length) return allDeps;
+      return allDeps.filter(d => statusFilter.includes(d.status));
+    },
+  );
 
   handleInputChange = evt => {
     this.setState({ inputValue: evt.target.value });
@@ -235,7 +239,7 @@ export default class DepsList extends Component {
         </div>
         <Table
           columns={this.getColumns()}
-          dataSource={this.getData()}
+          dataSource={this.getData(this.props, this.state)}
           size="small"
           pagination={false}
           rowKey="name"
@@ -246,9 +250,10 @@ export default class DepsList extends Component {
 }
 
 /* istanbul ignore next */
-function mapStateToProps(state) {
+function mapStateToProps(state, props) {
   return {
-    depStatus: state.config.depStatus,
+    deps: state.pluginDepsManager.home.deps,
+    latestVersions: state.pluginDepsManager.home.latestVersions,
   };
 }
 
@@ -259,7 +264,7 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-// export default connect(
-//   mapStateToProps,
-//   mapDispatchToProps,
-// )(DepsList);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(DepsList);

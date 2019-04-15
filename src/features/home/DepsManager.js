@@ -7,7 +7,7 @@ import { Spin, message } from 'antd';
 import { fetchDeps } from './redux/actions';
 import { OutputPanel, Resizer } from 'rs/features/common';
 import { DepsList } from './';
-import { depsSelector, devDepsSelector } from './selectors/depsSelector';
+// import { depsSelector, devDepsSelector } from './selectors/depsSelector';
 
 export class DepsManager extends Component {
   static propTypes = {
@@ -35,10 +35,10 @@ export class DepsManager extends Component {
       this.refresh();
     }
   }
-  getData(depsType) {
-    const deps = this.props.config.deps;
-    return depsType === 'dev' ? devDepsSelector(deps) : depsSelector(deps);
-  }
+  // getData(depsType) {
+  //   const deps = this.props.config.deps;
+  //   return depsType === 'dev' ? devDepsSelector(deps) : depsSelector(deps);
+  // }
   refresh() {
     this.props.actions.fetchDepsRemote();
     // let hideMessage;
@@ -77,7 +77,7 @@ export class DepsManager extends Component {
     if (!deps) return this.renderLoading();
     return (
       <div className="deps-manager_home-deps-manager">
-        <DepsList deps={deps} latestVersions={latestVersions} />
+        <DepsList />
       </div>
     );
     return 'deps manager';
