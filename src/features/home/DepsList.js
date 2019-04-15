@@ -136,18 +136,26 @@ export class DepsList extends Component {
     (props, state) => state.statusFilter,
     (deps, latestVersions, statusFilter) => {
       const allDeps = Object.keys(deps).map(key => {
-        const latestVersion = latestVersions[key];
-        const dep = deps[key];
-        const status =
-          latestVersion && dep.installedVersion !== '--'
-            ? semverDiff(dep.installedVersion, latestVersion) + '' // eslint-disable-line
-            : '';
-        return {
-          ...dep,
-          name: key,
-          latestVersion,
-          status,
-        };
+        try {
+          const latestVersion = latestVersions[key];
+          const dep = deps[key];
+          const status =
+            latestVersion && dep.installedVersion !== '--'
+              ? semverDiff(dep.installedVersion, latestVersion) + '' // eslint-disable-line
+              : '';
+          return {
+            ...dep,
+            name: key,
+            latestVersion,
+            status,
+          };
+        } catch (err) {
+          return {
+            ...deps[key],
+            name: key,
+            latestVersion: latestVersions[key] || null,
+          }
+        }
       });
       if (!statusFilter.length) return allDeps;
       return allDeps.filter(d => statusFilter.includes(d.status));

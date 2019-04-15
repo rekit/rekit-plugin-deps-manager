@@ -6,7 +6,7 @@ const childRoutes = [homeRoute];
 
 const routes = [
   {
-    path: '/boilerplate-rekit-plugin',
+    path: '/plugin-deps-manager',
     childRoutes: [...childRoutes].filter(
       r => r.component || (r.childRoutes && r.childRoutes.length > 0),
     ),

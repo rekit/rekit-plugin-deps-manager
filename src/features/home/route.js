@@ -3,7 +3,7 @@ import { Test } from './';
 // Learn more from: http://rekit.js.org/docs/routing.html
 
 export default {
-  path: 'deps-manager',
+  path: '',
   childRoutes: [
     { path: 'test1', component: Test },
   ],
