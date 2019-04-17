@@ -1,27 +1,11 @@
 @import '../../styles/mixins';
 
 .deps-manager_home-deps-list {
-  .toolbar {
-    margin: 0;
-    width: 100%;
-    &.no-top-margin {
-      margin-top: 0;
-    }
-    h3 {
-      margin: 0;
-      display: inline-block;
-      color: rgba(255, 255, 255, 0.7);
-    }
-    .ant-input {
-      .dark-input();
-      width: 300px;
-      float: right;
-      transform: translateY(4px);
-      margin-right: 10px;
-    }
-    .ant-btn {
-      float: right;
-      transform: translateY(4px);
+  .abs-full();
+  table {
+    border-radius: 0;
+    th {
+      border-radius: 0 !important;
     }
   }
 
@@ -29,8 +13,35 @@
     margin: 0;
   }
 
+  .ant-table-wrapper,
+  .ant-spin-nested-loading,
+  .ant-table,
+  .ant-table-content,
+  .ant-table-scroll,
+  .ant-spin-container {
+    height: 100%;
+  }
+
+  .ant-table-scroll {
+    display: flex;
+    flex-direction: column;
+    .ant-table-header {
+      background: none;
+      background-color: #3b3b3b;
+      padding-right: 0.5rem;
+      border-bottom: 1px solid #222 !important;
+
+    }
+    
+    .ant-table-body {
+      height: 0;
+      background: #2b2b2b!important;
+      flex-grow: 1;
+      .scroll-style();
+    }
+  }
+
   .ant-table-wrapper {
-    margin-top: 10px;
     .ant-table {
       background-color: #2b2b2b;
       border-color: rgba(255, 255, 255, 0) !important;
@@ -43,12 +54,14 @@
       background-color: #3b3b3b !important;
       color: #ccc;
       border-color: rgba(255, 255, 255, 0) !important;
-      border-bottom: 1px solid #222 !important;
+      padding: 4px 8px!important;
     }
     td {
+      background-color: #2b2b2b;
       border-color: rgba(255, 255, 255, 0) !important;
       border-bottom: 1px solid #222 !important;
       color: #bbb;
+      padding: 4px 8px!important;
       a {
         color: #bbb;
         &:hover {

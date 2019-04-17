@@ -72,6 +72,10 @@ export class DepsManager extends Component {
     );
   }
 
+  renderToolbar() {
+    return <div className="deps-manager-toolbar">aaa</div>;
+  }
+
   render() {
     const { deps, latestVersions } = this.props.home;
     if (!deps) return this.renderLoading();

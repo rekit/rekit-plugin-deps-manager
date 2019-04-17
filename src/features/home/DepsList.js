@@ -234,23 +234,13 @@ export class DepsList extends Component {
   render() {
     return (
       <div className="deps-manager_home-deps-list">
-        <div className="toolbar no-top-margin">
-          <Button type="primary" size="small" onClick={this.handleAddPackage}>
-            Add
-          </Button>
-          <Input
-            value={this.state.inputValue}
-            size="small"
-            onChange={this.handleInputChange}
-            onPressEnter={this.handleAddPackage}
-          />
-        </div>
         <Table
           columns={this.getColumns()}
           dataSource={this.getData(this.props, this.state)}
           size="small"
           pagination={false}
           rowKey="name"
+          scroll={{y:true}}
         />
       </div>
     );

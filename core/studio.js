@@ -1,5 +1,3 @@
-'use strict';
-
 // const rekitCore = require('rekit-core');
 const packageJson = require('package-json');
 const _ = require('lodash');
