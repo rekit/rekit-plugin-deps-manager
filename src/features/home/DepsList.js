@@ -26,6 +26,38 @@ export class DepsList extends Component {
       {
         dataIndex: 'name',
         title: 'Name',
+        filterDropdown: (
+          <div className="deps-manager_deps-list-type-filter">
+            <Menu
+              className="type-filter-menu"
+              selectedKeys={this.state.typeFilter}
+              multiple
+              onSelect={this.handleTypeFilter}
+              onDeselect={this.handleTypeFilter}
+            >
+              <Menu.Item key="null">
+                <span className="status-icon status-icon-null" /> Up to date
+              </Menu.Item>
+              <Menu.Item key="patch">
+                <span className="status-icon status-icon-patch" /> Patch update
+              </Menu.Item>
+              <Menu.Item key="minor">
+                <span className="status-icon status-icon-minor" /> Minor update
+              </Menu.Item>
+              <Menu.Item key="major">
+                <span className="status-icon status-icon-major" /> Major update
+              </Menu.Item>
+            </Menu>
+            <div className="filter-footer">
+              <Button size="small" type="primary" onClick={this.handleApplyStatusFilter}>
+                Ok
+              </Button>
+              <Button size="small" onClick={this.handleResetStatusFilter}>
+                Reset
+              </Button>
+            </div>
+          </div>
+        ),
         render(name) {
           return (
             <a href={`https://www.npmjs.com/package/${name}`} target="_blank">
@@ -57,33 +89,25 @@ export class DepsList extends Component {
               onSelect={this.handleStatusFilter}
               onDeselect={this.handleStatusFilter}
             >
-              <Menu.Item key="null">
-                <span className="status-icon status-icon-null" /> Up to date
+            <Menu.Item key="">
+              All
+              </Menu.Item>
+              <Menu.Item key="deps">
+              Dependencies
               </Menu.Item>
               <Menu.Item key="patch">
-                <span className="status-icon status-icon-patch" /> Patch update
+              Dev Dependencies
               </Menu.Item>
               <Menu.Item key="minor">
-                <span className="status-icon status-icon-minor" /> Minor update
-              </Menu.Item>
-              <Menu.Item key="major">
-                <span className="status-icon status-icon-major" /> Major update
+              Peer Dependencies
               </Menu.Item>
             </Menu>
-            <div className="filter-footer">
-              <Button size="small" type="primary" onClick={this.handleApplyStatusFilter}>
-                Ok
-              </Button>
-              <Button size="small" onClick={this.handleResetStatusFilter}>
-                Reset
-              </Button>
-            </div>
           </div>
         ),
         filterIcon: (
           <Icon
             type="filter"
-            style={{ color: this.state.statusFilter.length ? '#03a9f4' : '#aaa' }}
+            style={{ color: this.state.typeFilter ? '#03a9f4' : '#aaa' }}
           />
         ),
         filterDropdownVisible: this.state.statusFilterDropdownVisible,
