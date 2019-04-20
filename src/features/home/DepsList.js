@@ -8,6 +8,7 @@ import semverDiff from 'semver-diff';
 import { fetchDeps, refresh } from './redux/actions';
 // import { getDeps } from '../selectors/depsSelector';
 import { createSelector } from 'reselect';
+import element from 'rs/common/element';
 
 export class DepsList extends Component {
   static propTypes = {
@@ -20,6 +21,7 @@ export class DepsList extends Component {
     statusFilterDropdownVisible: false,
     typeFilter: 'all_key',
     inputValue: '',
+    showRefName: '',
     onShowOutput() {},
   };
 
@@ -80,9 +82,17 @@ export class DepsList extends Component {
       {
         dataIndex: 'refs',
         title: 'Refs',
-        width: 80,
+        align: 'center',
+        width: 100,
         render: (_, item) => {
-          return <span>{npmRef[item.name] ? npmRef[item.name].length : 0}</span>;
+          return (
+            <div
+              style={{ cursor: 'pointer' }}
+              onClick={() => this.setState({ showRefName: item.name })}
+            >
+              {npmRef[item.name] ? npmRef[item.name].length : 0}
+            </div>
+          );
         },
       },
       {
@@ -185,7 +195,7 @@ export class DepsList extends Component {
     props => props.elementById,
     (props, state) => state.statusFilter,
     (props, state) => state.typeFilter.replace(/_key$/, ''),
-    (deps, latestVersions, elementById, statusFilter, typeFilter) => {      
+    (deps, latestVersions, elementById, statusFilter, typeFilter) => {
       const allDeps = Object.keys(deps).map(key => {
         try {
           const latestVersion = latestVersions[key];
@@ -219,7 +229,9 @@ export class DepsList extends Component {
         if (ele.deps) {
           ele.deps.forEach(dep => {
             if (dep.type !== 'npm') return;
-            const depId = dep.id.split('/')[0];
+            const arr = dep.id.split('/');
+            let depId = arr[0];
+            if (arr[0].startsWith('@') && arr.length > 1) depId = depId + '/' + arr[1];
             if (!npmRef[depId]) npmRef[depId] = [];
             npmRef[depId].push(ele.id);
           });
@@ -327,9 +339,34 @@ export class DepsList extends Component {
     this.props.onShowOutput();
   };
 
+  renderRefList() {
+    const name = this.state.showRefName;
+    const { npmRef } = this.getData(this.props, this.state);
+    return (
+      <div className="ref-list">
+        <div className="ref-list-content">
+          <Icon type="close" onClick={() => this.setState({ showRefName: '' })} />
+          <h6>References of module: {name}</h6>
+
+          <ul>
+            {npmRef[name] &&
+              npmRef[name].sort((s1, s2)=>s1.localeCompare(s2)).map(eleId => <li onClick={() => element.show(eleId)}>{eleId}</li>)}
+            {!npmRef[name] && (
+              <li className="no-ref">
+                No refrences found. But it doesn't mean the module is not used in the project, maybe it's used
+                as plugins like babel plugins. Or it's not detected by deps manager plugin.
+              </li>
+            )}
+          </ul>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     return (
       <div className="deps-manager_home-deps-list">
+        {this.state.showRefName && this.renderRefList()}
         <Table
           columns={this.getColumns()}
           dataSource={this.getData(this.props, this.state)}
