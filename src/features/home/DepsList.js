@@ -8,7 +8,7 @@ import semverDiff from 'semver-diff';
 import { fetchDeps, refresh, showRefList } from './redux/actions';
 // import { getDeps } from '../selectors/depsSelector';
 import { createSelector } from 'reselect';
-import element from 'rs/common/element';
+import { RefList } from './';
 
 export class DepsList extends Component {
   static propTypes = {
@@ -106,7 +106,7 @@ export class DepsList extends Component {
         dataIndex: 'status',
         title: (
           <span>
-            Latest <Icon type="reload" spin={this.state.refreshing} onClick={this.handleRefresh} />
+            Latest <Icon type="reload" spin={_.isEmpty(this.props.latestVersions)} onClick={this.handleRefresh} />
           </span>
         ),
         width: 140,
@@ -250,11 +250,7 @@ export class DepsList extends Component {
   );
 
   handleRefresh = () => {
-    if (this.state.refreshing) return;
-    this.setState({
-      refreshing: true,
-    });
-    setTimeout(() => this.setState({ refreshing: false }), 3000);
+    if (_.isEmpty(this.props.latestVersions)) return;
     this.props.actions.refresh();
   };
 
@@ -336,48 +332,21 @@ export class DepsList extends Component {
     this.props.onShowOutput();
   };
 
-  renderRefList() {
-    const name = this.props.showRefName;
-    const { npmRef } = this.getData(this.props, this.state);
-    return (
-      <div className="ref-list">
-        <div className="ref-list-content">
-          <Icon type="close" onClick={() => this.props.actions.showRefList('')} />
-          <h6>References of module: {name}</h6>
-
-          <ul>
-            {npmRef[name] &&
-              npmRef[name].length &&
-              npmRef[name]
-                .sort((s1, s2) => s1.localeCompare(s2))
-                .map(eleId => (
-                  <li key={eleId} onClick={() => element.show(eleId)}>
-                    {eleId}
-                  </li>
-                ))}
-            {(!npmRef[name] || !npmRef[name].length) && (
-              <li className="no-ref">
-                <p>No refrences found.</p>
-                <p style={{ color: '#666' }}>
-                  Note it doesn't mean the module is not used in the project, maybe it's used as
-                  plugins like babel plugins. Or it's not detected by deps manager plugin. You
-                  should confirm it yourself before removing a package.
-                </p>
-              </li>
-            )}
-          </ul>
-        </div>
-      </div>
-    );
-  }
-
   render() {
+    const { actions, showRefName } = this.props;
+    const data = this.getData(this.props, this.state);
     return (
       <div className="deps-manager_home-deps-list">
-        {this.props.showRefName && this.renderRefList()}
+        {showRefName && (
+          <RefList
+            name={showRefName}
+            npmRef={data.npmRef || {}}
+            showRefList={actions.showRefList}
+          />
+        )}
         <Table
           columns={this.getColumns()}
-          dataSource={this.getData(this.props, this.state)}
+          dataSource={data}
           size="small"
           pagination={false}
           rowKey="name"
