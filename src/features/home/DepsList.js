@@ -26,6 +26,7 @@ export class DepsList extends Component {
   getColumns() {
     const allDeps = this.getData(this.props, this.state);
     const allTypes = ['all'].concat(allDeps.types);
+    const npmRef = allDeps.npmRef;
     return [
       {
         dataIndex: 'name',
@@ -80,8 +81,8 @@ export class DepsList extends Component {
         dataIndex: 'refs',
         title: 'Refs',
         width: 80,
-        render: () => {
-          return <span>6</span>;
+        render: (_, item) => {
+          return <span>{npmRef[item.name] ? npmRef[item.name].length : 0}</span>;
         },
       },
       {
@@ -181,9 +182,10 @@ export class DepsList extends Component {
   getData = createSelector(
     props => props.deps,
     props => props.latestVersions,
+    props => props.elementById,
     (props, state) => state.statusFilter,
     (props, state) => state.typeFilter.replace(/_key$/, ''),
-    (deps, latestVersions, statusFilter, typeFilter) => {
+    (deps, latestVersions, elementById, statusFilter, typeFilter) => {      
       const allDeps = Object.keys(deps).map(key => {
         try {
           const latestVersion = latestVersions[key];
@@ -207,11 +209,23 @@ export class DepsList extends Component {
         }
       });
       const types = allDeps.map(d => d.type);
-      const countMap = _.mapValues(_.groupBy(types, a => a), arr => arr.length);
-      countMap.all = allDeps.length;
+      // const countMap = _.mapValues(_.groupBy(types, a => a), arr => arr.length);
+      // countMap.all = allDeps.length;
       allDeps.types = _.uniq(types);
-      allDeps.typeCountMap = countMap;
+      // allDeps.typeCountMap = countMap;
 
+      const npmRef = {};
+      Object.values(elementById).forEach(ele => {
+        if (ele.deps) {
+          ele.deps.forEach(dep => {
+            if (dep.type !== 'npm') return;
+            const depId = dep.id.split('/')[0];
+            if (!npmRef[depId]) npmRef[depId] = [];
+            npmRef[depId].push(ele.id);
+          });
+        }
+      });
+      allDeps.npmRef = npmRef;
       if (!statusFilter.length && typeFilter === 'all') return allDeps;
       const filteredAllDeps = allDeps.filter(d => {
         return (
@@ -220,7 +234,8 @@ export class DepsList extends Component {
         );
       });
       filteredAllDeps.types = allDeps.types;
-      filteredAllDeps.typeCountMap = allDeps.typeCountMap;
+      filteredAllDeps.npmRef = npmRef;
+      // filteredAllDeps.typeCountMap = allDeps.typeCountMap;
       return filteredAllDeps;
     },
   );
@@ -232,7 +247,7 @@ export class DepsList extends Component {
     });
     setTimeout(() => this.setState({ refreshing: false }), 3000);
     this.props.actions.refresh();
-  }
+  };
 
   handleInputChange = evt => {
     this.setState({ inputValue: evt.target.value });
@@ -333,6 +348,7 @@ function mapStateToProps(state, props) {
   return {
     deps: state.pluginDepsManager.home.deps,
     latestVersions: state.pluginDepsManager.home.latestVersions,
+    elementById: state.home.elementById,
   };
 }
 
