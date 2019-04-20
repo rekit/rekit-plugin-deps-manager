@@ -350,12 +350,19 @@ export class DepsList extends Component {
               npmRef[name].length &&
               npmRef[name]
                 .sort((s1, s2) => s1.localeCompare(s2))
-                .map(eleId => <li onClick={() => element.show(eleId)}>{eleId}</li>)}
+                .map(eleId => (
+                  <li key={eleId} onClick={() => element.show(eleId)}>
+                    {eleId}
+                  </li>
+                ))}
             {(!npmRef[name] || !npmRef[name].length) && (
               <li className="no-ref">
-                No refrences found. But it doesn't mean the module is not used in the project, maybe
-                it's used as plugins like babel plugins. Or it's not detected by deps manager
-                plugin.
+                <p>No refrences found.</p>
+                <p style={{ color: '#666' }}>
+                  Note it doesn't mean the module is not used in the project, maybe it's used as
+                  plugins like babel plugins. Or it's not detected by deps manager plugin. You
+                  should confirm it yourself before removing a package.
+                </p>
               </li>
             )}
           </ul>
