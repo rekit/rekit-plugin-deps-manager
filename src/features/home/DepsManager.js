@@ -76,8 +76,15 @@ export class DepsManager extends Component {
     return <div className="deps-manager-toolbar">aaa</div>;
   }
 
+  renderError() {
+    return <div className="deps-manager_home-deps-manager fetch-failed">
+        Failed to fetch dependencies. You can try again by restarting Rekit Studio.
+      </div>
+  }
+
   render() {
-    const { deps, latestVersions } = this.props.home;
+    const { deps, latestVersions, fetchDepsError } = this.props.home;
+    if (fetchDepsError) return this.renderError();
     if (!deps) return this.renderLoading();
     return (
       <div className="deps-manager_home-deps-manager">

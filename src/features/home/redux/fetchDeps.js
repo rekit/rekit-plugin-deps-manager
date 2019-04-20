@@ -70,7 +70,6 @@ export function reducer(state, action) {
         ...state,
         fetchDepsPending: false,
         fetchDepsError: null,
-        deps: action.data,
       };
 
     case HOME_FETCH_DEPS_FAILURE:

@@ -1,89 +1,119 @@
-// const rekitCore = require('rekit-core');
 const packageJson = require('package-json');
 const _ = require('lodash');
 const resolveFrom = require('resolve-from');
 const fs = require('fs-extra');
-// const helpers = require('../helpers');
-
-// const tils = rekitCore.utils;
+const chokidar = require('chokidar');
 
 let pkgCache = {};
+let allDeps;
+let watcher;
+
 // Clear cache every 2 hours.
 setInterval(() => {
   pkgCache = {};
 }, 7200000);
 
-const flush = _.debounce((io) => {
-  io.emit('DEPS_PLUGIN_LATEST_VERSION', _.mapValues(pkgCache, json => json.version));
-}, 1000);
-
-function fetchLatestVersions(names, io) {
-  // const requests = names.map(name => () =>
-  //   pkgCache[name] ? Promise.resolve(pkgCache[name]) : packageJson(name),
-  // );
-  names.forEach(name => {
-    if (pkgCache[name]) flush(io);
-    else packageJson(name).then(json => {
-      pkgCache[name] = json;
-      flush(io);
-    });
+const flushLatestVersions = _.debounce(io => {
+  io.emit({
+    type: 'PLUGIN_DEPS_MANAGER_LATEST_VERSIONS',
+    data: _.mapValues(pkgCache, json => json.version),
   });
-  // requests
-  //   .reduce((promise, request) => {
-  //     return promise
-  //       .then(json => {
-  //         if (json) {
-  //           io.emit('DEPS_PLUGIN_LATEST_VERSION', {
-  //             [json.name]: json.version,
-  //           });
-  //           pkgCache[json.name] = json;
-  //         }
-  //         return request();
-  //       })
-  //       .catch(err => request());
-  //   }, Promise.resolve())
-  //   .then(json => {
-  //     if (json) {
-  //       io.emit('DEPS_PLUGIN_LATEST_VERSION', {
-  //         [json.name]: json.version,
-  //       });
-  //       pkgCache[json.name] = json;
-  //     }
-  //     return null;
-  //   });
+  io.emit('DEPS_PLUGIN_LATEST_VERSION2', pkgCache);
+}, 500);
+
+function startWatch(io) {
+  if (watcher) return;
+  const { paths } = rekit.core;
+  watcher = chokidar.watch(
+    [paths.map('package.json'), paths.map('package-lock.json'), paths.map('yarn.lock')],
+    {
+      persist: true,
+    },
+  );
+  watcher.on('all', _.debounce((...a) => refresh(io), 100));
 }
-function config(server, app, args) {
-  // const pkgJsonPath = paths.map('package.json');
-  app.get('/api/plugin-deps-manager/deps', (req, res) => {
-    const { paths, config } = rekit.core;
-    const pkgJson = config.getPkgJson(true);
-    if (!pkgJson) {
-      res.send(JSON.stringify({ error: 'package.json not found.' }));
-      return;
-    }
 
-    const allDeps = Object.assign(
-      {},
-      pkgJson.dependencies || {},
-      pkgJson.devDependencies || {},
-      pkgJson.peerDependencies || {},
-    );
+function refresh(io) {
+  allDeps = null;
+  pkgCache = {};
+  fetchAllDeps(io);
+}
 
-    const prjRoot = paths.getProjectRoot();
-    Object.keys(allDeps).forEach(key => {
+const DEP_TYPES = [
+  'dependencies',
+  'devDependencies',
+  'peerDependencies',
+  'optionalDependencies',
+  'bundledDependencies',
+];
+
+const fetchAllDeps = _.debounce(io => {
+  const { paths, config } = rekit.core;
+  const pkgJson = config.getPkgJson(true);
+  if (!pkgJson) {
+    return;
+  }
+
+  allDeps = {};
+
+  const prjRoot = paths.getProjectRoot();
+  DEP_TYPES.forEach(type => {
+    const obj = pkgJson[type];
+    if (!obj) return;
+    Object.keys(obj).forEach(key => {
       let installedVersion = '--';
       try {
-        installedVersion = fs.readJsonSync(resolveFrom(prjRoot, `${key}/package.json`)).version; //  helpers.forceRequire(`${key}/package.json`).version; // eslint-disable-line
-      } catch (e) {} // eslint-disable-line
-      allDeps[key] = {
-        requiredVersion: allDeps[key],
-        installedVersion,
-      };
+        installedVersion = fs.readJsonSync(resolveFrom(prjRoot, `${key}/package.json`)).version;
+      } catch (e) {
+        // Do nothing if failed to get local installed version
+        // This happens if module not installed.
+      }
+      if (allDeps[key]) {
+        if (allDeps[key].duplicated) allDeps[key].duplicated.push(type);
+        else allDeps[key].duplicated = [type];
+      } else {
+        allDeps[key] = {
+          name: key,
+          requiredVersion: obj[key],
+          installedVersion,
+          type: type.replace(/dependencies/i, ''),
+        };
+      }
     });
+  });
+  fetchLatestVersions(io);
+  io.emit({
+    type: 'PLUGIN_DEPS_MANAGER_FETCH_ALL_DEPS_SUCCESS',
+    data: allDeps,
+  });
+}, 100);
 
-    fetchLatestVersions(Object.keys(allDeps), args.io);
+function fetchLatestVersions(io) {
+  if (!allDeps) return;
+  Object.keys(allDeps).forEach(name => {
+    if (pkgCache[name]) flushLatestVersions(io);
+    else
+      packageJson(name)
+        .then(json => {
+          pkgCache[name] = json;
+          flushLatestVersions(io);
+        })
+        .catch(() => {
+          rekit.core.logger.warn('Failed to get package info: ' + name);
+        });
+  });
+}
 
-    res.send(JSON.stringify(allDeps));
+function config(server, app, args) {
+  app.get('/api/plugin-deps-manager/refresh', (req, res) => {
+    refresh(args.io);
+    res.send(JSON.stringify({ success: true }));
+  });
+
+  app.get('/api/plugin-deps-manager/deps', (req, res) => {
+    startWatch(args.io);
+    fetchAllDeps(args.io);
+    res.send(JSON.stringify({ success: true }));
   });
 }
 

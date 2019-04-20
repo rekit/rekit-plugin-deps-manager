@@ -1,6 +1,6 @@
 @import '../../styles/mixins';
 
-.deps-manager_home-deps-list {
+body .deps-manager_home-deps-list {
   .abs-full();
   table {
     border-radius: 0;
@@ -27,15 +27,14 @@
     flex-direction: column;
     .ant-table-header {
       background: none;
-      background-color: #3b3b3b;
+      background-color: #333;
       padding-right: 0.5rem;
       border-bottom: 1px solid #222 !important;
-
     }
-    
+
     .ant-table-body {
       height: 0;
-      background: #2b2b2b!important;
+      background: #2b2b2b !important;
       flex-grow: 1;
       .scroll-style();
     }
@@ -51,22 +50,36 @@
     }
 
     th {
-      background-color: #3b3b3b !important;
+      background-color: #333 !important;
       color: #ccc;
       border-color: rgba(255, 255, 255, 0) !important;
-      padding: 4px 8px!important;
+      padding: 4px 8px !important;
+      .header-title > span {
+        font-size: 10px;
+        color: #999;
+      }
     }
     td {
       background-color: #2b2b2b;
       border-color: rgba(255, 255, 255, 0) !important;
       border-bottom: 1px solid #222 !important;
       color: #bbb;
-      padding: 4px 8px!important;
+      padding: 4px 8px !important;
       a {
         color: #bbb;
         &:hover {
           text-decoration: underline;
         }
+      }
+      .dep-type {
+        font-size: 10px;
+        background: #555;
+        border-radius: 2px;
+        margin-left: 3px;
+        display: inline-block;
+        padding: 0px 2px;
+        color: #ddd;
+        cursor: default;
       }
     }
     tr:hover td {
@@ -83,8 +96,9 @@
       display: inline;
     }
     .ant-table-filter-icon {
-      position: static;
+      position: relative;
       background: none !important;
+      transform: translate(5px, -6px);
     }
   }
   .status-null {
@@ -160,7 +174,8 @@
   }
 }
 
-.deps-manager_deps-list-status-filter {
+.deps-manager_deps-list-status-filter,
+.deps-manager_deps-list-type-filter {
   background-color: #fff;
   border-radius: 4px;
   overflow: hidden;
@@ -169,6 +184,9 @@
   }
   .status-icon {
     margin: 0 5px 0 0;
+  }
+  .status-all {
+    color: #666;
   }
   .status-null {
     color: #8bc34a;
@@ -214,7 +232,7 @@
     border-top: 1px solid #eee;
   }
 
-  .status-filter-menu {
+  .filter-menu {
     padding: 10px 0;
     .ant-menu-item {
       line-height: 32px;

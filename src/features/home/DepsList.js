@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
@@ -15,13 +16,16 @@ export class DepsList extends Component {
   };
 
   state = {
-    statusFilter: [],
+    statusFilter: 'all',
     statusFilterDropdownVisible: false,
+    typeFilter: 'all_key',
     inputValue: '',
     onShowOutput() {},
   };
 
   getColumns() {
+    const allDeps = this.getData(this.props, this.state);
+    const allTypes = ['all'].concat(allDeps.types);
     return [
       {
         dataIndex: 'name',
@@ -29,41 +33,47 @@ export class DepsList extends Component {
         filterDropdown: (
           <div className="deps-manager_deps-list-type-filter">
             <Menu
-              className="type-filter-menu"
-              selectedKeys={this.state.typeFilter}
-              multiple
+              className="filter-menu"
+              selectedKeys={[this.state.typeFilter]}
               onSelect={this.handleTypeFilter}
-              onDeselect={this.handleTypeFilter}
             >
-              <Menu.Item key="null">
-                <span className="status-icon status-icon-null" /> Up to date
-              </Menu.Item>
-              <Menu.Item key="patch">
-                <span className="status-icon status-icon-patch" /> Patch update
-              </Menu.Item>
-              <Menu.Item key="minor">
-                <span className="status-icon status-icon-minor" /> Minor update
-              </Menu.Item>
-              <Menu.Item key="major">
-                <span className="status-icon status-icon-major" /> Major update
-              </Menu.Item>
+              {allTypes.map(t => (
+                <Menu.Item key={`${t}_key`}>
+                  {_.capitalize(t)} Deps
+                </Menu.Item>
+              ))}
             </Menu>
-            <div className="filter-footer">
-              <Button size="small" type="primary" onClick={this.handleApplyStatusFilter}>
-                Ok
-              </Button>
-              <Button size="small" onClick={this.handleResetStatusFilter}>
-                Reset
-              </Button>
-            </div>
           </div>
         ),
-        render(name) {
+        filterIcon: (
+          <Icon
+            type="filter"
+            style={{ color: this.state.typeFilter !== 'all_key' ? '#03a9f4' : '#aaa' }}
+          />
+        ),
+        filterDropdownVisible: this.state.typeFilterDropdownVisible,
+        onFilterDropdownVisibleChange: visible => {
+          this.setState({
+            typeFilterDropdownVisible: visible,
+          });
+        },
+        render(name, item) {
           return (
-            <a href={`https://www.npmjs.com/package/${name}`} target="_blank">
-              {name}
-            </a>
+            <React.Fragment>
+              <a href={`https://www.npmjs.com/package/${name}`} target="_blank">
+                {name}
+              </a>
+              {item.type && <span className="dep-type">{item.type}</span>}
+            </React.Fragment>
           );
+        },
+      },
+      {
+        dataIndex: 'refs',
+        title: 'Refs',
+        width: 80,
+        render: () => {
+          return <span>6</span>;
         },
       },
       {
@@ -83,31 +93,33 @@ export class DepsList extends Component {
         filterDropdown: (
           <div className="deps-manager_deps-list-status-filter">
             <Menu
-              className="status-filter-menu"
-              selectedKeys={this.state.statusFilter}
-              multiple
+              className="filter-menu"
+              selectedKeys={[this.state.statusFilter]}
               onSelect={this.handleStatusFilter}
-              onDeselect={this.handleStatusFilter}
             >
-            <Menu.Item key="">
-              All
+              <Menu.Item key="all">
+                <span className="status-icon status-icon-all" /> All
               </Menu.Item>
-              <Menu.Item key="deps">
-              Dependencies
+              <Menu.Item key="null">
+                <span className="status-icon status-icon-null" /> Up to date
               </Menu.Item>
               <Menu.Item key="patch">
-              Dev Dependencies
+                <span className="status-icon status-icon-patch" /> Patch update
               </Menu.Item>
               <Menu.Item key="minor">
-              Peer Dependencies
+                <span className="status-icon status-icon-minor" /> Minor update
+              </Menu.Item>
+              <Menu.Item key="major">
+                <span className="status-icon status-icon-major" /> Major update
               </Menu.Item>
             </Menu>
           </div>
         ),
+
         filterIcon: (
           <Icon
             type="filter"
-            style={{ color: this.state.typeFilter ? '#03a9f4' : '#aaa' }}
+            style={{ color: this.state.statusFilter !== 'all' ? '#03a9f4' : '#aaa' }}
           />
         ),
         filterDropdownVisible: this.state.statusFilterDropdownVisible,
@@ -132,7 +144,7 @@ export class DepsList extends Component {
       {
         dataIndex: 'action',
         title: 'Action',
-        width: 100,
+        width: 80,
         align: 'center',
         render: (__, item) => {
           return (
@@ -158,7 +170,8 @@ export class DepsList extends Component {
     props => props.deps,
     props => props.latestVersions,
     (props, state) => state.statusFilter,
-    (deps, latestVersions, statusFilter) => {
+    (props, state) => state.typeFilter.replace(/_key$/, ''),
+    (deps, latestVersions, statusFilter, typeFilter) => {
       const allDeps = Object.keys(deps).map(key => {
         try {
           const latestVersion = latestVersions[key];
@@ -178,11 +191,25 @@ export class DepsList extends Component {
             ...deps[key],
             name: key,
             latestVersion: latestVersions[key] || null,
-          }
+          };
         }
       });
-      if (!statusFilter.length) return allDeps;
-      return allDeps.filter(d => statusFilter.includes(d.status));
+      const types = allDeps.map(d => d.type);
+      const countMap = _.mapValues(_.groupBy(types, a => a), arr => arr.length);
+      countMap.all = allDeps.length;
+      allDeps.types = _.uniq(types);
+      allDeps.typeCountMap = countMap;
+
+      if (!statusFilter.length && typeFilter === 'all') return allDeps;
+      const filteredAllDeps = allDeps.filter(d => {
+        return (
+          (statusFilter === 'all' || statusFilter === d.status) &&
+          (typeFilter === 'all' || d.type === typeFilter)
+        );
+      });
+      filteredAllDeps.types = allDeps.types;
+      filteredAllDeps.typeCountMap = allDeps.typeCountMap;
+      return filteredAllDeps;
     },
   );
 
@@ -237,7 +264,16 @@ export class DepsList extends Component {
 
   handleStatusFilter = args => {
     this.setState({
-      statusFilter: args.selectedKeys,
+      statusFilter: args.key,
+      statusFilterDropdownVisible: false,
+    });
+  };
+
+  handleTypeFilter = args => {
+    console.log('handle type filter: ', args);
+    this.setState({
+      typeFilter: args.key,
+      typeFilterDropdownVisible: false,
     });
   };
 
@@ -264,7 +300,7 @@ export class DepsList extends Component {
           size="small"
           pagination={false}
           rowKey="name"
-          scroll={{y:true}}
+          scroll={{ y: true }}
         />
       </div>
     );

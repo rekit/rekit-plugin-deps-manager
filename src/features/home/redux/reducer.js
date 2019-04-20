@@ -17,16 +17,21 @@ export default function reducer(state = initialState, action) {
   let newState = state;
   switch (action.type) {
     // Handle cross-topic actions here
-    case 'ON_SOCKET_MESSAGE': {
-      if (action.data.type === 'DEPS_PLUGIN_LATEST_VERSION') {
+    case 'PLUGIN_DEPS_MANAGER_LATEST_VERSIONS': {
         newState = {
           ...state,
           latestVersions: {
             ...state.latestVersions,
-            ...action.data.payload,
+            ...action.data,
           },
         };
-      }
+      break;
+    }
+     case 'PLUGIN_DEPS_MANAGER_FETCH_ALL_DEPS_SUCCESS': {
+        newState = {
+          ...state,
+          deps: action.data,
+        };
       break;
     }
     default:
