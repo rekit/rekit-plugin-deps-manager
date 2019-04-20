@@ -1,4 +1,4 @@
-@import '../../styles/mixins';
+ @import '../../styles/mixins';
 
 body .deps-manager_home-deps-list {
   .abs-full();
@@ -58,6 +58,11 @@ body .deps-manager_home-deps-list {
         font-size: 10px;
         color: #999;
       }
+      .anticon-reload {
+        font-size: 11px;
+        margin-left: 5px;
+        cursor: pointer;
+      }
     }
     td {
       background-color: #2b2b2b;
@@ -80,6 +85,19 @@ body .deps-manager_home-deps-list {
         padding: 0px 2px;
         color: #ddd;
         cursor: default;
+      }
+      .dup-items {
+        color: red;
+        display: block;
+        font-size: 10px;
+        .dup-item {
+          display: inline-block;
+          padding: 0 2px;
+          border-radius: 2px;
+          margin-left: 3px;
+          background: red;
+          color:#fff;
+        }
       }
     }
     tr:hover td {

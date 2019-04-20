@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {
   HOME_REFRESH_BEGIN,
   HOME_REFRESH_SUCCESS,
@@ -21,7 +22,7 @@ export function refresh(args = {}) {
       // doRequest is a placeholder Promise. You should replace it with your own logic.
       // See the real-word example at:  https://github.com/supnate/rekit/blob/master/src/features/home/redux/fetchRedditReactjsList.js
       // args.error here is only for test coverage purpose.
-      const doRequest = args.error ? Promise.reject(new Error()) : Promise.resolve();
+      const doRequest = axios.get('/api/plugin-deps-manager/refresh-deps');
       doRequest.then(
         (res) => {
           dispatch({
@@ -61,6 +62,7 @@ export function reducer(state, action) {
         ...state,
         refreshPending: true,
         refreshError: null,
+        latestVersions: {},
       };
 
     case HOME_REFRESH_SUCCESS:

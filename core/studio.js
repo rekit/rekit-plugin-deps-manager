@@ -105,7 +105,7 @@ function fetchLatestVersions(io) {
 }
 
 function config(server, app, args) {
-  app.get('/api/plugin-deps-manager/refresh', (req, res) => {
+  app.get('/api/plugin-deps-manager/refresh-deps', (req, res) => {
     refresh(args.io);
     res.send(JSON.stringify({ success: true }));
   });

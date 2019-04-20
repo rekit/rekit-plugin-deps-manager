@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Icon, Input, Table, Spin, Menu, Modal } from 'antd';
 import semverDiff from 'semver-diff';
-import * as actions from './redux/actions';
+import { fetchDeps, refresh } from './redux/actions';
 // import { getDeps } from '../selectors/depsSelector';
 import { createSelector } from 'reselect';
 
@@ -38,9 +38,7 @@ export class DepsList extends Component {
               onSelect={this.handleTypeFilter}
             >
               {allTypes.map(t => (
-                <Menu.Item key={`${t}_key`}>
-                  {_.capitalize(t)} Deps
-                </Menu.Item>
+                <Menu.Item key={`${t}_key`}>{_.capitalize(t)} Deps</Menu.Item>
               ))}
             </Menu>
           </div>
@@ -64,6 +62,16 @@ export class DepsList extends Component {
                 {name}
               </a>
               {item.type && <span className="dep-type">{item.type}</span>}
+              {item.duplicated && item.duplicated.length > 0 && (
+                <span className="dup-items">
+                  Duplicated in:
+                  {item.duplicated.map(d => (
+                    <span key={d} className="dup-item">
+                      {d}
+                    </span>
+                  ))}
+                </span>
+              )}
             </React.Fragment>
           );
         },
@@ -88,7 +96,11 @@ export class DepsList extends Component {
       },
       {
         dataIndex: 'status',
-        title: 'Latest',
+        title: (
+          <span>
+            Latest <Icon type="reload" spin={this.state.refreshing} onClick={this.handleRefresh} />
+          </span>
+        ),
         width: 140,
         filterDropdown: (
           <div className="deps-manager_deps-list-status-filter">
@@ -213,6 +225,15 @@ export class DepsList extends Component {
     },
   );
 
+  handleRefresh = () => {
+    if (this.state.refreshing) return;
+    this.setState({
+      refreshing: true,
+    });
+    setTimeout(() => this.setState({ refreshing: false }), 3000);
+    this.props.actions.refresh();
+  }
+
   handleInputChange = evt => {
     this.setState({ inputValue: evt.target.value });
   };
@@ -318,7 +339,7 @@ function mapStateToProps(state, props) {
 /* istanbul ignore next */
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...actions }, dispatch),
+    actions: bindActionCreators({ fetchDeps, refresh }, dispatch),
   };
 }
 
