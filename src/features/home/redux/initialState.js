@@ -16,6 +16,8 @@ const initialState = {
   refreshPending: false,
   refreshError: null,
   showRefName: '',
+  execNpmCmdPending: false,
+  execNpmCmdError: null,
 };
 
 export default initialState;

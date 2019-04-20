@@ -11,8 +11,9 @@ import { reducer as fetchDepsRemoteReducer } from './fetchDepsRemote';
 import { reducer as fetchDepsReducer } from './fetchDeps';
 import { reducer as refreshReducer } from './refresh';
 import { reducer as showRefListReducer } from './showRefList';
+import { reducer as execNpmCmdReducer } from './execNpmCmd';
 
-const reducers = [fetchDepsRemoteReducer, fetchDepsReducer, refreshReducer, showRefListReducer];
+const reducers = [fetchDepsRemoteReducer, fetchDepsReducer, refreshReducer, showRefListReducer, execNpmCmdReducer];
 
 export default function reducer(state = initialState, action) {
   let newState = state;
