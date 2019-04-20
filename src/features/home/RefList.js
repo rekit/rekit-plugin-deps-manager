@@ -13,10 +13,16 @@ export default class RefList extends Component {
   render() {
     const { name, npmRef, showRefList } = this.props;
     return (
-      <div className="plugin-deps-manager_home-ref-list">
+      <div
+        className="plugin-deps-manager_home-ref-list"
+        ref={node => (this.rootNode = node)}
+        onClick={evt => {
+          if (evt.target === this.rootNode) showRefList('');
+        }}
+      >
         <div className="ref-list-content">
           <Icon type="close" onClick={() => showRefList('')} />
-          <h6>References of module: {name}</h6>
+          <h6>References to the module: {name}</h6>
 
           <ul>
             {npmRef[name] &&
