@@ -230,7 +230,7 @@ export class DepsList extends Component {
             let depId = arr[0];
             if (arr[0].startsWith('@') && arr.length > 1) depId = depId + '/' + arr[1];
             if (!npmRef[depId]) npmRef[depId] = [];
-            npmRef[depId].push(ele.id);
+            if (!npmRef[depId].includes(ele.id)) npmRef[depId].push(ele.id);
           });
         }
       });
