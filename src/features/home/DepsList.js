@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Icon, Input, Table, Spin, Menu, Modal } from 'antd';
 import semverDiff from 'semver-diff';
-import { fetchDeps, refresh } from './redux/actions';
+import { fetchDeps, refresh, showRefList } from './redux/actions';
 // import { getDeps } from '../selectors/depsSelector';
 import { createSelector } from 'reselect';
 import element from 'rs/common/element';
@@ -14,6 +14,7 @@ export class DepsList extends Component {
   static propTypes = {
     deps: PropTypes.object.isRequired,
     latestVersions: PropTypes.object.isRequired,
+    showRefName: PropTypes.string.isRequired,
   };
 
   state = {
@@ -21,7 +22,6 @@ export class DepsList extends Component {
     statusFilterDropdownVisible: false,
     typeFilter: 'all_key',
     inputValue: '',
-    showRefName: '',
     onShowOutput() {},
   };
 
@@ -86,10 +86,7 @@ export class DepsList extends Component {
         width: 100,
         render: (_, item) => {
           return (
-            <div
-              style={{ cursor: 'pointer' }}
-              onClick={() => this.setState({ showRefName: item.name })}
-            >
+            <div className="ref-count" onClick={() => this.props.actions.showRefList(item.name)}>
               {npmRef[item.name] ? npmRef[item.name].length : 0}
             </div>
           );
@@ -340,21 +337,25 @@ export class DepsList extends Component {
   };
 
   renderRefList() {
-    const name = this.state.showRefName;
+    const name = this.props.showRefName;
     const { npmRef } = this.getData(this.props, this.state);
     return (
       <div className="ref-list">
         <div className="ref-list-content">
-          <Icon type="close" onClick={() => this.setState({ showRefName: '' })} />
+          <Icon type="close" onClick={() => this.props.actions.showRefList('')} />
           <h6>References of module: {name}</h6>
 
           <ul>
             {npmRef[name] &&
-              npmRef[name].sort((s1, s2)=>s1.localeCompare(s2)).map(eleId => <li onClick={() => element.show(eleId)}>{eleId}</li>)}
-            {!npmRef[name] && (
+              npmRef[name].length &&
+              npmRef[name]
+                .sort((s1, s2) => s1.localeCompare(s2))
+                .map(eleId => <li onClick={() => element.show(eleId)}>{eleId}</li>)}
+            {(!npmRef[name] || !npmRef[name].length) && (
               <li className="no-ref">
-                No refrences found. But it doesn't mean the module is not used in the project, maybe it's used
-                as plugins like babel plugins. Or it's not detected by deps manager plugin.
+                No refrences found. But it doesn't mean the module is not used in the project, maybe
+                it's used as plugins like babel plugins. Or it's not detected by deps manager
+                plugin.
               </li>
             )}
           </ul>
@@ -366,7 +367,7 @@ export class DepsList extends Component {
   render() {
     return (
       <div className="deps-manager_home-deps-list">
-        {this.state.showRefName && this.renderRefList()}
+        {this.props.showRefName && this.renderRefList()}
         <Table
           columns={this.getColumns()}
           dataSource={this.getData(this.props, this.state)}
@@ -384,6 +385,7 @@ export class DepsList extends Component {
 function mapStateToProps(state, props) {
   return {
     deps: state.pluginDepsManager.home.deps,
+    showRefName: state.pluginDepsManager.home.showRefName,
     latestVersions: state.pluginDepsManager.home.latestVersions,
     elementById: state.home.elementById,
   };
@@ -392,7 +394,7 @@ function mapStateToProps(state, props) {
 /* istanbul ignore next */
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ fetchDeps, refresh }, dispatch),
+    actions: bindActionCreators({ fetchDeps, refresh, showRefList }, dispatch),
   };
 }
 

@@ -15,6 +15,7 @@ const initialState = {
   latestVersions: {},
   refreshPending: false,
   refreshError: null,
+  showRefName: '',
 };
 
 export default initialState;

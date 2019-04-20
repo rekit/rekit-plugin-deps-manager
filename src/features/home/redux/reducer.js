@@ -10,8 +10,9 @@ import initialState from './initialState';
 import { reducer as fetchDepsRemoteReducer } from './fetchDepsRemote';
 import { reducer as fetchDepsReducer } from './fetchDeps';
 import { reducer as refreshReducer } from './refresh';
+import { reducer as showRefListReducer } from './showRefList';
 
-const reducers = [fetchDepsRemoteReducer, fetchDepsReducer, refreshReducer];
+const reducers = [fetchDepsRemoteReducer, fetchDepsReducer, refreshReducer, showRefListReducer];
 
 export default function reducer(state = initialState, action) {
   let newState = state;
