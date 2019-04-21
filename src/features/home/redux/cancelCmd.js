@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {
   HOME_CANCEL_CMD_BEGIN,
   HOME_CANCEL_CMD_SUCCESS,
@@ -21,7 +22,9 @@ export function cancelCmd(args = {}) {
       // doRequest is a placeholder Promise. You should replace it with your own logic.
       // See the real-word example at:  https://github.com/supnate/rekit/blob/master/src/features/home/redux/fetchRedditReactjsList.js
       // args.error here is only for test coverage purpose.
-      const doRequest = args.error ? Promise.reject(new Error()) : Promise.resolve();
+      const doRequest = axios.post('/api/plugin-deps-manager/manage-package', {
+        action: 'cancel',
+      });
       doRequest.then(
         (res) => {
           dispatch({
@@ -61,6 +64,7 @@ export function reducer(state, action) {
         ...state,
         cancelCmdPending: true,
         cancelCmdError: null,
+        outputVisible: false,
       };
 
     case HOME_CANCEL_CMD_SUCCESS:

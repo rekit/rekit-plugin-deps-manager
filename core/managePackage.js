@@ -5,6 +5,13 @@ const terminate = require('terminate');
 let term;
 const managePackage = (req, res, args) => {
   const { action, pkgName, version, type } = req.body;
+
+  if (action === 'cancel') {
+    if (term) term.kill();
+    res.send(JSON.stringify({ success: true }));
+    return;
+  }
+
   const params = [];
   // const saveArg = `--save${type ? ('-' + type) : ''}`;
   if (term) return;
@@ -12,9 +19,6 @@ const managePackage = (req, res, args) => {
     params.push('install', `${pkgName}@latest`);
   } else if (action === 'delete') {
     params.push('uninstall', pkgName);
-  } else if (action === 'cancel') {
-    if (term) terminate(term);
-    res.send(pkgName);
   } else {
     res.send('unknown action: ' + action);
     return;
@@ -57,7 +61,7 @@ const managePackage = (req, res, args) => {
     data: {
       action: action,
       pkgName: pkgName,
-      version: pkgName.version,
+      version: version,
     },
   });
   res.send(pkgName);

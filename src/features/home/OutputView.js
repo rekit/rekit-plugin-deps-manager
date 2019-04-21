@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { PtyOutput } from 'rs/features/pty';
-import { Icon } from 'antd';
+import { Icon, Modal } from 'antd';
 import { hideOutput, cancelCmd } from './redux/actions';
 import { clearOutput } from 'rs/features/pty/redux/actions';
 
@@ -14,7 +14,14 @@ export class OutputView extends Component {
   };
 
   handleCancel = () => {
-    this.props.actions.cancelCmd();
+    Modal.confirm({
+      title: 'Confirm',
+      content: 'Are you sure to cancel?',
+      okText: 'Yes',
+      onOk: () => {
+        this.props.actions.cancelCmd();
+      },
+    });
   };
   handleClose = () => {
     this.props.actions.hideOutput();
