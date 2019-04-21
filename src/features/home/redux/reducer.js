@@ -7,22 +7,18 @@
 // https://medium.com/@nate_wang/a-new-approach-for-managing-redux-actions-91c26ce8b5da.
 
 import initialState from './initialState';
-import { reducer as fetchDepsRemoteReducer } from './fetchDepsRemote';
 import { reducer as fetchDepsReducer } from './fetchDeps';
 import { reducer as refreshReducer } from './refresh';
 import { reducer as showRefListReducer } from './showRefList';
-import { reducer as execNpmCmdReducer } from './execNpmCmd';
 import { reducer as updatePackageReducer } from './updatePackage';
 import { reducer as showOutputReducer } from './showOutput';
 import { reducer as cancelCmdReducer } from './cancelCmd';
 import { reducer as hideOutputReducer } from './hideOutput';
 
 const reducers = [
-  fetchDepsRemoteReducer,
   fetchDepsReducer,
   refreshReducer,
   showRefListReducer,
-  execNpmCmdReducer,
   updatePackageReducer,
   showOutputReducer,
   cancelCmdReducer,

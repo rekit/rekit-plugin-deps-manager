@@ -6,8 +6,6 @@
 
 // NOTE: initialState constant is necessary so that Rekit could auto add initial state when creating async actions.
 const initialState = {
-  fetchDepsRemotePending: false,
-  fetchDepsRemoteError: null,
   fetchDepsPending: false,
   fetchDepsError: null,
 
@@ -16,8 +14,6 @@ const initialState = {
   refreshPending: false,
   refreshError: null,
   showRefName: '',
-  execNpmCmdPending: false,
-  execNpmCmdError: null,
   updatePackagePending: false,
   updatePackageError: null,
 
