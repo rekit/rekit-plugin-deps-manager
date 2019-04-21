@@ -5,16 +5,21 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Icon, Input, Table, Spin, Menu, Modal } from 'antd';
 import semverDiff from 'semver-diff';
-import { fetchDeps, refresh, showRefList } from './redux/actions';
+import { fetchDeps, refresh, showRefList, updatePackage } from './redux/actions';
 // import { getDeps } from '../selectors/depsSelector';
 import { createSelector } from 'reselect';
-import { RefList } from './';
+import { RefList, OutputView } from './';
 
 export class DepsList extends Component {
   static propTypes = {
     deps: PropTypes.object.isRequired,
     latestVersions: PropTypes.object.isRequired,
     showRefName: PropTypes.string.isRequired,
+    running: PropTypes.object,
+  };
+
+  static defaultProps = {
+    running: null,
   };
 
   state = {
@@ -106,7 +111,12 @@ export class DepsList extends Component {
         dataIndex: 'status',
         title: (
           <span>
-            Latest <Icon type="reload" spin={_.isEmpty(this.props.latestVersions)} onClick={this.handleRefresh} />
+            Latest{' '}
+            <Icon
+              type="reload"
+              spin={_.isEmpty(this.props.latestVersions)}
+              onClick={this.handleRefresh}
+            />
           </span>
         ),
         width: 140,
@@ -172,7 +182,7 @@ export class DepsList extends Component {
               <Icon
                 type="arrow-up"
                 title="Upgrade to the latest version."
-                onClick={() => this.handleUpdatePackage(item.name)}
+                onClick={() => this.handleUpdatePackage(item)}
               />
               <Icon
                 type="close"
@@ -269,19 +279,24 @@ export class DepsList extends Component {
     });
   };
 
-  handleUpdatePackage = name => {
+  handleUpdatePackage = item => {
     Modal.confirm({
       title: 'Confirm',
       content: 'Are you sure to update the package to the latest version?',
       okText: 'Yes',
       onOk: () => {
-        this.props.onShowOutput();
-        this.props.actions.updatePackage(name).catch(e => {
-          Modal.error({
-            title: 'Failed to update package',
-            content: 'Please retry or raise an issue on github.com/supnate/rekit',
+        this.props.actions
+          .updatePackage({
+            pkgName: item.name,
+            version: item.latestVersion || null,
+            type: item.type,
+          })
+          .catch(e => {
+            Modal.error({
+              title: 'Failed to update package',
+              content: 'Please retry or raise an issue on github.com/rekit/rekit',
+            });
           });
-        });
       },
     });
   };
@@ -344,6 +359,7 @@ export class DepsList extends Component {
             showRefList={actions.showRefList}
           />
         )}
+        {(this.props.running || this.props.outputVisible) && <OutputView />}
         <Table
           columns={this.getColumns()}
           dataSource={data}
@@ -361,6 +377,8 @@ export class DepsList extends Component {
 function mapStateToProps(state, props) {
   return {
     deps: state.pluginDepsManager.home.deps,
+    outputVisible: state.pluginDepsManager.home.outputVisible,
+    running: state.pluginDepsManager.home.running,
     showRefName: state.pluginDepsManager.home.showRefName,
     latestVersions: state.pluginDepsManager.home.latestVersions,
     elementById: state.home.elementById,
@@ -370,7 +388,7 @@ function mapStateToProps(state, props) {
 /* istanbul ignore next */
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ fetchDeps, refresh, showRefList }, dispatch),
+    actions: bindActionCreators({ fetchDeps, refresh, showRefList, updatePackage }, dispatch),
   };
 }
 

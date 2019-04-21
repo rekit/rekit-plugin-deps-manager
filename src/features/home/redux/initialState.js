@@ -18,6 +18,13 @@ const initialState = {
   showRefName: '',
   execNpmCmdPending: false,
   execNpmCmdError: null,
+  updatePackagePending: false,
+  updatePackageError: null,
+
+  outputVisible: false,
+  running: null,
+  cancelCmdPending: false,
+  cancelCmdError: null,
 };
 
 export default initialState;

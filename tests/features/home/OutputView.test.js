@@ -1,19 +1,19 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { NpmExecutor } from '../../../src/features/home/NpmExecutor';
+import { OutputView } from '../../../src/features/home/OutputView';
 
-describe('home/NpmExecutor', () => {
+describe('home/OutputView', () => {
   it('renders node with correct class name', () => {
     const props = {
       home: {},
       actions: {},
     };
     const renderedComponent = shallow(
-      <NpmExecutor {...props} />
+      <OutputView {...props} />
     );
 
     expect(
-      renderedComponent.find('.home-npm-executor').length
+      renderedComponent.find('.home-output-view').length
     ).toBe(1);
   });
 });

@@ -12,30 +12,67 @@ import { reducer as fetchDepsReducer } from './fetchDeps';
 import { reducer as refreshReducer } from './refresh';
 import { reducer as showRefListReducer } from './showRefList';
 import { reducer as execNpmCmdReducer } from './execNpmCmd';
+import { reducer as updatePackageReducer } from './updatePackage';
+import { reducer as showOutputReducer } from './showOutput';
+import { reducer as cancelCmdReducer } from './cancelCmd';
+import { reducer as hideOutputReducer } from './hideOutput';
 
-const reducers = [fetchDepsRemoteReducer, fetchDepsReducer, refreshReducer, showRefListReducer, execNpmCmdReducer];
+const reducers = [
+  fetchDepsRemoteReducer,
+  fetchDepsReducer,
+  refreshReducer,
+  showRefListReducer,
+  execNpmCmdReducer,
+  updatePackageReducer,
+  showOutputReducer,
+  cancelCmdReducer,
+  hideOutputReducer,
+];
 
 export default function reducer(state = initialState, action) {
   let newState = state;
   switch (action.type) {
     // Handle cross-topic actions here
+    case 'HOME_FETCH_PROJECT_DATA_SUCCESS':
+      if (action.data.pluginDepsManager) {
+        const running = action.data.pluginDepsManager.running || null;
+        newState = {
+          ...state,
+          running,
+          outputVisible: !!running,
+        };
+      }
+      break;
     case 'PLUGIN_DEPS_MANAGER_LATEST_VERSIONS': {
-        newState = {
-          ...state,
-          latestVersions: {
-            ...state.latestVersions,
-            ...action.data,
-          },
-        };
+      newState = {
+        ...state,
+        latestVersions: {
+          ...state.latestVersions,
+          ...action.data,
+        },
+      };
       break;
     }
-     case 'PLUGIN_DEPS_MANAGER_FETCH_ALL_DEPS_SUCCESS': {
-        newState = {
-          ...state,
-          deps: action.data,
-        };
+    case 'PLUGIN_DEPS_MANAGER_FETCH_ALL_DEPS_SUCCESS':
+      newState = {
+        ...state,
+        deps: action.data,
+      };
       break;
-    }
+    case 'PLUGIN_DEPS_MANAGER_MANAGE_PACKAGE_EXIT':
+      newState = {
+        ...state,
+        running: null,
+      };
+      break;
+    case 'PLUGIN_DEPS_MANAGER_MANAGE_PACKAGE_STARTED':
+      newState = {
+        ...state,
+        running: action.data,
+        outputVisible: true,
+      };
+      break;
+
     default:
       newState = state;
       break;

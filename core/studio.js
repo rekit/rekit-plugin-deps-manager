@@ -115,7 +115,9 @@ function config(server, app, args) {
     res.send(JSON.stringify({ success: true }));
   });
 
-  app.post('/api/plugin-deps-manager/exec-npm-cmd', (req, res) => require('./execNpmCmd')(req, res, args));
+  app.post('/api/plugin-deps-manager/manage-package', (req, res) => require('./managePackage')(req, res, args));
+  app.post('/api/plugin-deps-manager/update-package', (req, res) => require('./updatePackage')(req, res, args));
+  app.post('/api/plugin-deps-manager/delete-package', (req, res) => require('./deletePackage')(req, res, args));
 }
 
 module.exports = { config };
