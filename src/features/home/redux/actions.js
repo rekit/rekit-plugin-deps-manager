@@ -5,3 +5,4 @@ export { updatePackage, dismissUpdatePackageError } from './updatePackage';
 export { showOutput } from './showOutput';
 export { cancelCmd, dismissCancelCmdError } from './cancelCmd';
 export { hideOutput } from './hideOutput';
+export { removePackage, dismissRemovePackageError } from './removePackage';

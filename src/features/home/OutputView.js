@@ -19,6 +19,7 @@ export class OutputView extends Component {
       content: 'Are you sure to cancel?',
       okText: 'Yes',
       onOk: () => {
+        this.props.actions.clearOutput('manage_package_term');
         this.props.actions.cancelCmd();
       },
     });

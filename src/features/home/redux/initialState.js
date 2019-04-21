@@ -21,6 +21,8 @@ const initialState = {
   running: null,
   cancelCmdPending: false,
   cancelCmdError: null,
+  removePackagePending: false,
+  removePackageError: null,
 };
 
 export default initialState;

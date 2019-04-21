@@ -5,10 +5,11 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Icon, Input, Table, Spin, Menu, Modal } from 'antd';
 import semverDiff from 'semver-diff';
-import { fetchDeps, refresh, showRefList, updatePackage } from './redux/actions';
+import { fetchDeps, refresh, showRefList, updatePackage, removePackage } from './redux/actions';
 // import { getDeps } from '../selectors/depsSelector';
 import { createSelector } from 'reselect';
 import { RefList, OutputView } from './';
+import { clearOutput } from 'rs/features/pty/redux/actions';
 
 export class DepsList extends Component {
   static propTypes = {
@@ -285,6 +286,7 @@ export class DepsList extends Component {
       content: 'Are you sure to update the package to the latest version?',
       okText: 'Yes',
       onOk: () => {
+        this.props.actions.clearOutput('manage_package_term');
         this.props.actions
           .updatePackage({
             pkgName: item.name,
@@ -307,13 +309,8 @@ export class DepsList extends Component {
       okText: 'Yes',
       okType: 'danger',
       onOk: () => {
-        this.props.onShowOutput();
-        this.props.actions.removePackage(name).catch(e => {
-          Modal.error({
-            title: 'Failed to remote package',
-            content: 'Please retry or raise an issue on github.com/supnate/rekit',
-          });
-        });
+        this.props.actions.clearOutput('manage_package_term');
+        this.props.actions.removePackage(name);
       },
     });
   };
@@ -388,7 +385,10 @@ function mapStateToProps(state, props) {
 /* istanbul ignore next */
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ fetchDeps, refresh, showRefList, updatePackage }, dispatch),
+    actions: bindActionCreators(
+      { fetchDeps, refresh, showRefList, updatePackage, removePackage, clearOutput },
+      dispatch,
+    ),
   };
 }
 

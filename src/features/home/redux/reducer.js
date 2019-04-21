@@ -14,6 +14,7 @@ import { reducer as updatePackageReducer } from './updatePackage';
 import { reducer as showOutputReducer } from './showOutput';
 import { reducer as cancelCmdReducer } from './cancelCmd';
 import { reducer as hideOutputReducer } from './hideOutput';
+import { reducer as removePackageReducer } from './removePackage';
 
 const reducers = [
   fetchDepsReducer,
@@ -23,6 +24,7 @@ const reducers = [
   showOutputReducer,
   cancelCmdReducer,
   hideOutputReducer,
+  removePackageReducer,
 ];
 
 export default function reducer(state = initialState, action) {

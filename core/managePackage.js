@@ -17,7 +17,7 @@ const managePackage = (req, res, args) => {
   if (term) return;
   if (action === 'update') {
     params.push('install', `${pkgName}@latest`);
-  } else if (action === 'delete') {
+  } else if (action === 'uninstall') {
     params.push('uninstall', pkgName);
   } else {
     res.send('unknown action: ' + action);
