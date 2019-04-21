@@ -13,13 +13,12 @@ setInterval(() => {
   pkgCache = {};
 }, 7200000);
 
-const flushLatestVersions = _.debounce(io => {
+const flushLatestVersions = _.throttle(io => {
   io.emit({
     type: 'PLUGIN_DEPS_MANAGER_LATEST_VERSIONS',
     data: _.mapValues(pkgCache, json => json.version),
   });
-  io.emit('DEPS_PLUGIN_LATEST_VERSION2', pkgCache);
-}, 500);
+}, 1000);
 
 function startWatch(io) {
   if (watcher) return;
@@ -115,6 +114,8 @@ function config(server, app, args) {
     fetchAllDeps(args.io);
     res.send(JSON.stringify({ success: true }));
   });
+
+  app.post('/api/plugin-deps-manager/exec-npm-cmd', (req, res) => require('./execNpmCmd')(req, res, args));
 }
 
 module.exports = { config };
