@@ -1,3 +1,5 @@
+/* Normally you don't need to modify this file, it's mainly maintained by Rekit */
+
 import homeRoute from '../features/home/route';
 
 // NOTE: DO NOT CHANGE the 'childRoutes' name and the declaration pattern.
