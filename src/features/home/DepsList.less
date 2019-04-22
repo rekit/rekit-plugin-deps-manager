@@ -166,10 +166,6 @@ body .deps-manager_home-deps-list {
   }
 
   .actions {
-    .anticon-close {
-      margin-left: 8px;
-    }
-
     .anticon {
       display: inline-block;
       background-color: #444;
@@ -178,19 +174,28 @@ body .deps-manager_home-deps-list {
       height: 14px;
       border-radius: 7px;
       padding-top: 2px;
-      padding-left: 1px;
+      padding-left: 0px;
       cursor: pointer;
+      margin-left: 6px;
+      &:first-child {
+        margin-left: 0;
+      }
     }
-
-    .anticon-loading-3-quarters {
-      background-color: transparent;
+    .anticon-vertical-right {
+      transform: rotate(90deg);
     }
   }
   tr:hover .actions {
-    .anticon-arrow-up {
+    .update-in-range {
+      background-color: #03a9f4;
+      color: #fff;
+    }
+
+    .update-to-latest {
       background-color: #8bc34a;
       color: #fff;
     }
+
     .anticon-close {
       background-color: #e91e63;
       color: #fff;

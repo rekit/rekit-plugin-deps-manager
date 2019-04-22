@@ -22,10 +22,7 @@ export function updatePackage(args = {}) {
       // doRequest is a placeholder Promise. You should replace it with your own logic.
       // See the real-word example at:  https://github.com/supnate/rekit/blob/master/src/features/home/redux/fetchRedditReactjsList.js
       // args.error here is only for test coverage purpose.
-      const doRequest = axios.post('/api/plugin-deps-manager/manage-package', {
-        action: 'update',
-        ...args
-      });
+      const doRequest = axios.post('/api/plugin-deps-manager/manage-package', args);
       doRequest.then(
         (res) => {
           dispatch({

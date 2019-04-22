@@ -182,9 +182,17 @@ export class DepsList extends Component {
             <div className="actions">
               <Icon
                 type="arrow-up"
-                title="Upgrade to the latest version."
+                className="update-in-range"
+                title="Update according to the required range."
+                onClick={() => this.handleUpdatePackage(item, { inRange: true })}
+              />
+              <Icon
+                type="vertical-right"
+                className="update-to-latest"
+                title="Update to the latest version."
                 onClick={() => this.handleUpdatePackage(item)}
               />
+
               <Icon
                 type="close"
                 title="Remove"
@@ -280,7 +288,7 @@ export class DepsList extends Component {
     });
   };
 
-  handleUpdatePackage = item => {
+  handleUpdatePackage = (item, args = {}) => {
     Modal.confirm({
       title: 'Confirm',
       content: 'Are you sure to update the package to the latest version?',
@@ -289,6 +297,7 @@ export class DepsList extends Component {
         this.props.actions.clearOutput('manage_package_term');
         this.props.actions
           .updatePackage({
+            action: args.inRange ? 'update-in-range' : 'update',
             pkgName: item.name,
             version: item.latestVersion || null,
             type: item.type,

@@ -37,7 +37,7 @@ export default function reducer(state = initialState, action) {
         newState = {
           ...state,
           running,
-          outputVisible: !!running,
+          outputVisible: state.outputVisible || !!running,
         };
       }
       break;

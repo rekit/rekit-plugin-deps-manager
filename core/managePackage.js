@@ -1,29 +1,38 @@
 const _ = require('lodash');
 const pty = require('node-pty');
-const terminate = require('terminate');
 
 let term;
 const managePackage = (req, res, args) => {
-  const { action, pkgName, version, type } = req.body;
+  const { action, pkgName, version } = req.body;
 
   if (action === 'cancel') {
     if (term) term.kill();
     res.send(JSON.stringify({ success: true }));
     return;
   }
+  const useYarn = rekit.core.utils.useYarn();
+
+  let cmd;
+  if (useYarn) cmd = process.platform === 'win32' ? 'yarn.cmd' : 'yarn';
+  else cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
   const params = [];
-  // const saveArg = `--save${type ? ('-' + type) : ''}`;
   if (term) return;
   if (action === 'update') {
-    params.push('install', `${pkgName}@latest`);
+    if (useYarn) params.push('upgrade', `${pkgName}@latest`);
+    else params.push('install', `${pkgName}@latest`);
+  } else if (action === 'update-in-range') {
+    if (useYarn) params.push('upgrade', `${pkgName}`);
+    else params.push('update', `${pkgName}`);
   } else if (action === 'uninstall') {
-    params.push('uninstall', pkgName);
+    if (useYarn) params.push('remove', pkgName);
+    else params.push('uninstall', pkgName);
   } else {
     res.send('unknown action: ' + action);
     return;
   }
-  const cmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+  
+
   term = pty.spawn(cmd, params, {
     name: 'xterm-color',
     cwd: rekit.core.paths.getProjectRoot(),
