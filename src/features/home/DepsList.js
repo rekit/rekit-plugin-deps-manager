@@ -291,7 +291,7 @@ export class DepsList extends Component {
   handleUpdatePackage = (item, args = {}) => {
     Modal.confirm({
       title: 'Confirm',
-      content: 'Are you sure to update the package to the latest version?',
+      content: 'Are you sure to update the package?',
       okText: 'Yes',
       onOk: () => {
         this.props.actions.clearOutput('manage_package_term');
