@@ -3,10 +3,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Button, Icon, Input, Table, Spin, Menu, Modal } from 'antd';
+import { Icon, Table, Menu, Modal } from 'antd';
 import semverDiff from 'semver-diff';
 import { fetchDeps, refresh, showRefList, updatePackage, removePackage } from './redux/actions';
-// import { getDeps } from '../selectors/depsSelector';
 import { createSelector } from 'reselect';
 import { RefList, OutputView } from './';
 import { clearOutput } from 'rs/features/pty/redux/actions';
@@ -67,7 +66,7 @@ export class DepsList extends Component {
         render(name, item) {
           return (
             <React.Fragment>
-              <a href={`https://www.npmjs.com/package/${name}`} target="_blank">
+              <a href={`https://www.npmjs.com/package/${name}`} target="_blank" rel="noopener noreferrer">
                 {name}
               </a>
               {item.type && <span className="dep-type">{item.type}</span>}

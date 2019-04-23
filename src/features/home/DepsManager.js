@@ -3,15 +3,14 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Spin, message } from 'antd';
+import { Spin } from 'antd';
 import { fetchDeps } from './redux/actions';
-import { OutputPanel, Resizer } from 'rs/features/common';
 import { DepsList } from './';
-// import { depsSelector, devDepsSelector } from './selectors/depsSelector';
 
 export class DepsManager extends Component {
   static propTypes = {
-    home: PropTypes.object.isRequired,
+    deps: PropTypes.object.isRequired,
+    fetchDepsError: PropTypes.object,
     actions: PropTypes.object.isRequired,
   };
 
@@ -20,11 +19,8 @@ export class DepsManager extends Component {
   };
 
   componentDidMount() {
-    const { home, actions } = this.props;
+    const { actions } = this.props;
     actions.fetchDeps();
-    // if ((!this.props.pluginDepsManager.deps || this.props.pluginDepsManager.depsNeedReload) && !this.props.pluginDepsManager.fetchDepsPending) {
-    //   this.refresh();
-    // }
   }
 
   componentDidUpdate2(prevProps) {
@@ -35,26 +31,6 @@ export class DepsManager extends Component {
       this.refresh();
     }
   }
-  // getData(depsType) {
-  //   const deps = this.props.config.deps;
-  //   return depsType === 'dev' ? devDepsSelector(deps) : depsSelector(deps);
-  // }
-  refresh() {
-    this.props.actions.fetchDepsRemote();
-    // let hideMessage;
-    // this.props.actions
-    //   .fetchDeps()
-    //   .then(() => {
-    //     hideMessage = message.loading('Fetching latest versions...', 0);
-    //     return this.props.actions.fetchDepsRemote();
-    //   })
-    //   .then(() => {
-    //     if (hideMessage) hideMessage();
-    //   });
-  }
-
-  showOutput = () => this.setState({ outputVisible: true });
-  hideOutput = () => this.setState({ outputVisible: false });
 
   handleResize = pos => {
     this.props.actions.setDepsOutputHeight(pos.bottom);
@@ -83,7 +59,7 @@ export class DepsManager extends Component {
   }
 
   render() {
-    const { deps, latestVersions, fetchDepsError } = this.props.home;
+    const { deps, fetchDepsError } = this.props;
     if (fetchDepsError) return this.renderError();
     if (!deps) return this.renderLoading();
     return (
@@ -91,56 +67,14 @@ export class DepsManager extends Component {
         <DepsList />
       </div>
     );
-    return 'deps manager';
-    if (!this.props.config.deps) return this.renderLoading();
-    const outputVisible = this.state.outputVisible;
-    return (
-      <div className="rekit-plugin-deps-manager_home-deps-manager">
-        <div
-          className="deps-container"
-          style={{ bottom: `${outputVisible ? this.props.config.depsOutputHeight : 0}px` }}
-        >
-          <DepsList deps={this.getData()} depsType="deps" onShowOutput={this.showOutput} />
-          <br />
-          <DepsList deps={this.getData('dev')} depsType="devDeps" onShowOutput={this.showOutput} />
-          <br />
-          <p className="note">
-            NOTE 1: The latest version of npm package is cached for two hours. If you want to force
-            refresh the latest version, please restart Rekit Studio.
-          </p>
-          <p className="note">
-            NOTE 2: Rekit uses yarn if yarn.lock exists otherwise uses npm to install/update/remove
-            packages. If you use neither npm nor yarn to manage packages you can't
-            install/update/remove packages from this page.
-          </p>
-        </div>
-        {outputVisible && (
-          <Resizer
-            direction="horizontal"
-            position={{ bottom: `${this.props.config.depsOutputHeight - 2}px` }}
-            onResize={this.handleResize}
-          />
-        )}
-        {outputVisible && (
-          <OutputPanel
-            onClose={this.hideOutput}
-            filter={['install-package', 'update-package', 'remove-package']}
-            style={{ height: `${this.props.config.depsOutputHeight}px` }}
-          />
-        )}
-      </div>
-    );
   }
 }
 
 /* istanbul ignore next */
 function mapStateToProps(state) {
-  // return _.pick(state.config, [
-  //   'depStatus',
-
-  // ]);
   return {
-    home: state.pluginDepsManager.home,
+    deps: state.pluginDepsManager.home.deps,
+    fetchDepsError: state.pluginDepsManager.home.fetchDepsError,
   };
 }
 

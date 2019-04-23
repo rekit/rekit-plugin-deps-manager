@@ -19,6 +19,6 @@
   },
   "dependencies": {
     "package-json": "^6.3.0",
-    "resolve-from": "^4.0.0"
+    "resolve-from": "^5.0.0"
   }
 }
