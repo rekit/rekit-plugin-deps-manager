@@ -1,6 +1,6 @@
 {
   "name": "rekit-plugin-deps-manager",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "homepage": "https://github.com/rekit/rekit-plugin-deps-manager",
   "author": "Nate Wang <supnate@gmail.com>",
   "repository": {
@@ -8,6 +8,11 @@
     "url": "git+https://github.com/rekit/rekit-plugin-deps-manager"
   },
   "license": "MIT",
+  "files": [
+    "build",
+    "core",
+    "package.json"
+  ],
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
@@ -17,8 +22,7 @@
     "test": "node scripts/test.js"
   },
   "devDependencies": {
-    "react-redux": "^7.0.2",
-    "rekit-studio-sdk": "^3.0.0-beta.7"
+    "rekit-studio-sdk": "next"
   },
   "featureFiles": [
     "package.json"
