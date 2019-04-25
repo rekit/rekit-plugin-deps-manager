@@ -8,11 +8,6 @@ let pkgCache = {};
 let allDeps;
 let watcher;
 
-// Clear cache every 2 hours.
-setInterval(() => {
-  pkgCache = {};
-}, 7200000);
-
 const flushLatestVersions = _.throttle(io => {
   io.emit({
     type: 'PLUGIN_DEPS_MANAGER_LATEST_VERSIONS',
@@ -20,7 +15,7 @@ const flushLatestVersions = _.throttle(io => {
   });
 }, 1000);
 
-function startWatch(io) {
+function startWatch(io) {console.log('start watch')
   if (watcher) return;
   const { paths } = rekit.core;
   watcher = chokidar.watch(

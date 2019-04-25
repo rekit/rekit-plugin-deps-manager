@@ -8,6 +8,7 @@
   ],
   "files": [
     "package.json",
+    "test.js",
     "rekit.json"
   ]
 }

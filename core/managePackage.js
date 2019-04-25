@@ -1,8 +1,9 @@
 const _ = require('lodash');
-const pty = require('node-pty');
 
 let term;
 const managePackage = (req, res, args) => {
+  const pty = require('node-pty');
+
   const { action, pkgName, version } = req.body;
 
   if (action === 'cancel') {
@@ -31,7 +32,6 @@ const managePackage = (req, res, args) => {
     res.send('unknown action: ' + action);
     return;
   }
-  
 
   term = pty.spawn(cmd, params, {
     name: 'xterm-color',
