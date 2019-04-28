@@ -43,8 +43,9 @@ const DEP_TYPES = [
 
 const fetchAllDeps = _.debounce(io => {
   const { paths, config } = rekit.core;
-  const pkgJson = config.getPkgJson(true);
+  const pkgJson = config.getPkgJson();
   if (!pkgJson) {
+    allDeps = null;
     return;
   }
 
