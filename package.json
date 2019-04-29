@@ -1,6 +1,6 @@
 {
   "name": "rekit-plugin-deps-manager",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "homepage": "https://github.com/rekit/rekit-plugin-deps-manager",
   "author": "Nate Wang <supnate@gmail.com>",
   "repository": {
@@ -24,9 +24,6 @@
   "devDependencies": {
     "rekit-studio-sdk": "^3.0.0-beta.12"
   },
-  "featureFiles": [
-    "package.json"
-  ],
   "eslintConfig": {
     "extends": "react-app"
   },
