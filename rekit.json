@@ -2,13 +2,8 @@
   "devPort": 4000,
   "servePort": 4001,
   "appType": "rekit-plugin",
+  "rekitTest": true,
   "css": "less",
-  "folders": [
-    "scripts"
-  ],
-  "files": [
-    "package.json",
-    "test.js",
-    "rekit.json"
-  ]
+  "folders": ["scripts"],
+  "files": ["package.json", "test.js", "rekit.json"]
 }
