@@ -15,7 +15,7 @@ const flushLatestVersions = _.throttle(io => {
   });
 }, 1000);
 
-function startWatch(io) {console.log('start watch')
+function startWatch(io) {
   if (watcher) return;
   const { paths } = rekit.core;
   watcher = chokidar.watch(
@@ -111,7 +111,9 @@ function config(server, app, args) {
     res.send(JSON.stringify({ success: true }));
   });
 
-  app.post('/api/plugin-deps-manager/manage-package', (req, res) => require('./managePackage')(req, res, args));
+  app.post('/api/plugin-deps-manager/manage-package', (req, res) =>
+    require('./managePackage')(req, res, args),
+  );
 }
 
 module.exports = { config };
