@@ -58,7 +58,6 @@ export class OutputView extends Component {
           <div className="output-container">
             <PtyOutput id="manage_package_term" />
           </div>
-          <div className="footer">footer</div>
         </div>
       </div>
     );

@@ -1,6 +1,6 @@
 {
   "name": "rekit-plugin-deps-manager",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "homepage": "https://github.com/rekit/rekit-plugin-deps-manager",
   "author": "Nate Wang <supnate@gmail.com>",
   "repository": {
