@@ -19,16 +19,18 @@
     "serve": "node scripts/serve.js",
     "deploy": "node scripts/deploy.js",
     "undeploy": "node scripts/undeploy.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "mvn": "mvn --version"
   },
   "devDependencies": {
-    "rekit-studio-sdk": "^3.0.0-beta.17"
+    "rekit-studio-sdk": "^3.0.0-beta.24"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
   "dependencies": {
     "package-json": "^6.3.0",
+    "rekit-core": "^3.0.0-beta.22",
     "resolve-from": "^5.0.0"
   }
 }
